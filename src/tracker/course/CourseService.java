@@ -11,15 +11,15 @@ public class CourseService {
         }
 
         if(points[1] != 0){
-            updatePointsForCourse(CoursesNames.DSA.getCourseName(), studentId, points[0]);
+            updatePointsForCourse(CoursesNames.DSA.getCourseName(), studentId, points[1]);
         }
 
         if(points[2] != 0){
-            updatePointsForCourse(CoursesNames.DATABASES.getCourseName(), studentId, points[0]);
+            updatePointsForCourse(CoursesNames.DATABASES.getCourseName(), studentId, points[2]);
         }
 
         if(points[3] != 0){
-            updatePointsForCourse(CoursesNames.SPRING.getCourseName(), studentId, points[0]);
+            updatePointsForCourse(CoursesNames.SPRING.getCourseName(), studentId, points[3]);
         }
 
     }

@@ -12,4 +12,18 @@ public class CourseRepository {
     public static Course getCourseByName(String courseName){
         return courseRepository.stream().filter(course -> course.getCourseName().equals(courseName)).findAny().get();
     }
+
+    public static void printRepository() {
+         courseRepository.forEach( course -> {
+             System.out.println(course.getCourseName());
+             course.getStudentsWithScore().forEach((integer, integers) -> {
+                 System.out.println(integer+": ");
+                 integers.forEach(s -> System.out.print(s+", "));
+                 System.out.println("");
+             } ) ;
+         }
+         );
+
+    }
+
 }

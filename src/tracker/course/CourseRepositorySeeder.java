@@ -12,8 +12,15 @@ public class CourseRepositorySeeder {
 
             CourseService.updatePoints(10004, new int[]{0, 1, 0, 0});
 
-            CourseService.updatePoints(10001, new int[]{0, 3, 2, 0});
+            CourseService.updatePoints(10005, new int[]{0, 12, 0, 15});
+
+            CourseService.updatePoints(10006, new int[]{8, 10, 5, 5});
+
+            CourseService.updatePoints(10007, new int[]{16, 0, 15, 5});
+
+
 
         }
+
     }
 }

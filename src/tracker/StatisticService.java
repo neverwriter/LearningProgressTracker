@@ -1,10 +1,11 @@
 package tracker;
 
 import tracker.course.CourseRepository;
-import tracker.student.Student;
-import tracker.student.StudentRepository;
+
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 
 public class StatisticService {
@@ -23,10 +24,10 @@ public class StatisticService {
         System.out.printf("Easiest course: %s\n", NOT_APPLICABLE);
         System.out.printf("Hardest course: %s\n", NOT_APPLICABLE);
 
-//        printInfoAboutTopLearners("Java");
-//        printInfoAboutTopLearners("DSA");
-//        printInfoAboutTopLearners("Databases");
-//        printInfoAboutTopLearners("Spring");
+        printInfoAboutTopLearners(CoursesNames.JAVA.getCourseName(), JAVA_POINTS);
+        printInfoAboutTopLearners(CoursesNames.DSA.getCourseName(), DSA_POINTS);
+        printInfoAboutTopLearners(CoursesNames.DATABASES.getCourseName(), DATABASES_POINTS);
+        printInfoAboutTopLearners(CoursesNames.SPRING.getCourseName(), SPRING_POINTS);
 
     }
 
@@ -91,61 +92,40 @@ public class StatisticService {
         return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString().replace(" ", ", ");
     }
 
-//    public static void printInfoAboutTopLearners(String courseName) {
+    public static void printInfoAboutTopLearners(String courseName, int baseCoursePoints) {
+
+        System.out.println(courseName);
+        System.out.println("id     points  completed");
+
+        HashMap<Integer, Integer> studentsWithFullScore = new HashMap<>();
+
+        CourseRepository
+                .getCourseByName(courseName)
+                .getStudentsWithScore()
+                .forEach((integer, integers) -> studentsWithFullScore
+                        .put(integer, integers
+                        .stream()
+                        .mapToInt( s -> s)
+                        .sum()));
+
+//        HashMap<Integer, Integer> students = new HashMap<>();
 //
-//        System.out.println(courseName);
-//        System.out.println("id     points  completed");
+//        students = studentsWithFullScore.entrySet().stream().sorted().collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
 //
-//        ArrayList<Student> students = StudentRepository.getStudentRepository();
-//
-//        if (courseName.equals("Java")) {
-//            students
-//                    .stream()
-//                    .sorted(Comparator.comparingInt(Student::getJavaPoints).reversed())
-//                    .filter(student -> student.getJavaPoints() != 0)
-//                    .forEach(student -> System.out.printf(Locale.US,
-//                            "%d  %-8d %.1f%%\n",
-//                            student.getId(),
-//                            student.getJavaPoints(),
-//                            (double) student.getJavaPoints() * 100 / JAVA_POINTS));
-//        }
-//
-//        if (courseName.equals("DSA")) {
-//            students
-//                    .stream()
-//                    .sorted(Comparator.comparingInt(Student::getDsaPoints).reversed())
-//                    .filter(student -> student.getDsaPoints() != 0)
-//                    .forEach(student -> System.out.printf(Locale.US,
-//                            "%d  %-8d %.1f%%\n",
-//                            student.getId(),
-//                            student.getDsaPoints(),
-//                            (double) student.getDsaPoints() * 100 / JAVA_POINTS));
-//        }
-//
-//        if (courseName.equals("Databases")) {
-//            students
-//                    .stream()
-//                    .sorted(Comparator.comparingInt(Student::getDbPoints).reversed())
-//                    .filter(student -> student.getDbPoints() != 0)
-//                    .forEach(student -> System.out.printf(Locale.US,
-//                            "%d  %-8d %.1f%%\n",
-//                            student.getId(),
-//                            student.getDbPoints(),
-//                            (double) student.getDbPoints() * 100 / JAVA_POINTS));
-//        }
-//
-//        if (courseName.equals("Spring")) {
-//            students
-//                    .stream()
-//                    .sorted(Comparator.comparingInt(Student::getSpringPoints).reversed())
-//                    .filter(student -> student.getSpringPoints() != 0)
-//                    .forEach(student -> System.out.printf(Locale.US,
-//                            "%d  %-8d %.1f%%\n",
-//                            student.getId(),
-//                            student.getSpringPoints(),
-//                            (double) student.getSpringPoints() * 100 / JAVA_POINTS));
-//        }
-//    }
+//        students.forEach((key, value) -> System.out.printf(Locale.US,
+//                "%d  %-8d %.1f%%\n",
+//                key,
+//                value,
+//                (double) value * 100 / baseCoursePoints));
+
+        studentsWithFullScore.forEach((key, value) -> System.out.printf(Locale.US,
+                "%d  %-8d %.1f%%\n",
+                key,
+                value,
+                (double) value * 100 / baseCoursePoints));
+
+ studentsWithFullScore.clear();
+    }
 
     public static int[] getPoints(int studentId){
         int[] points = new int[4];

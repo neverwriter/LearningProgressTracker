@@ -2,6 +2,7 @@ package tracker;
 
 
 import tracker.course.CourseRepository;
+import tracker.course.CourseRepositorySeeder;
 import tracker.course.CourseService;
 import tracker.student.Student;
 import tracker.student.StudentCredentialsChecker;
@@ -159,6 +160,7 @@ public class ProgramController {
 
         StudentRepositorySeeder.fillWithStudents();
 
+        CourseRepositorySeeder.fillWithPoints();
 
     }
 
