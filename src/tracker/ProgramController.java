@@ -42,7 +42,6 @@ public class ProgramController {
                 studentAddCommand = CommandReader.readCommand();
 
             }
-            ;
 
             System.out.printf("Total %d students have been added\n", counter);
 

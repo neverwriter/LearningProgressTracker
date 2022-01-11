@@ -10,7 +10,7 @@ public class CourseRepositorySeeder {
 
             CourseService.updatePoints(10002, new int[]{20, 0, 7, 0});
 
-            CourseService.updatePoints(10004, new int[]{0, 1, 0, 0});
+            CourseService.updatePoints(10004, new int[]{0, 0, 0, 2});
 
             CourseService.updatePoints(10005, new int[]{0, 12, 0, 15});
 
