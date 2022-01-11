@@ -1,6 +1,14 @@
 package tracker;
 
 
+import tracker.course.CourseRepository;
+import tracker.course.CourseRepositorySeeder;
+import tracker.course.CourseService;
+import tracker.student.Student;
+import tracker.student.StudentCredentialsChecker;
+import tracker.student.StudentRepository;
+import tracker.student.StudentRepositorySeeder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +42,6 @@ public class ProgramController {
                 studentAddCommand = CommandReader.readCommand();
 
             }
-            ;
 
             System.out.printf("Total %d students have been added\n", counter);
 
@@ -118,7 +125,7 @@ public class ProgramController {
 
         } else {
 
-            int[] points = StudentRepository.getPoints(id);
+            int[] points = StatisticService.getPoints(id);
 
             System.out.printf("%d points: Java=%d; DSA=%d; Databases=%d; Spring=%d\n", id, points[0], points[1], points[2], points[3]);
 
@@ -151,7 +158,8 @@ public class ProgramController {
     private void seedStudentRepository() {
 
         StudentRepositorySeeder.fillWithStudents();
-        StudentRepositorySeeder.fillWithPoints();
+
+        CourseRepositorySeeder.fillWithPoints();
 
     }
 
@@ -201,7 +209,7 @@ public class ProgramController {
 
                     if (checkIfPointsAreGreaterThanOrEqualZero(points) && studentPoints.size() == 5) {
 
-                        StudentRepository.updatePoints(id, points);
+                        CourseService.updatePoints(id, points);
                         System.out.println("Points updated.");
 
                     } else throw new Exception();

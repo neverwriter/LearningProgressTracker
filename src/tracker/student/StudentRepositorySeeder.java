@@ -1,4 +1,6 @@
-package tracker;
+package tracker.student;
+
+
 
 public class StudentRepositorySeeder {
 
@@ -14,16 +16,6 @@ public class StudentRepositorySeeder {
         StudentRepository.addStudent(new Student("Ed", "Eden", "a1@a1.a1"));
     }
 
-    public static void fillWithPoints(){
-        StudentRepository.updatePoints(10000, new int[] {34, 0, 8, 16});
-        StudentRepository.updatePoints(10001, new int[] {0, 300, 65,0});
-        StudentRepository.updatePoints(10002, new int[] {45, 0, 0, 0});
-        StudentRepository.updatePoints(10003, new int[] {150, 100, 200, 300});
-        StudentRepository.updatePoints(10004, new int[] {0, 0, 0, 100});
-        StudentRepository.updatePoints(10005, new int[] {85, 95, 0, 0});
-        StudentRepository.updatePoints(10006, new int[] {49, 58, 98, 32});
-        StudentRepository.updatePoints(10007, new int[] {254, 0, 148, 0});
-    }
 }
 
 

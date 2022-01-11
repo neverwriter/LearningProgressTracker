@@ -1,7 +1,11 @@
 package tracker;
 
-import java.math.RoundingMode;
+import tracker.course.Course;
+import tracker.course.CourseRepository;
+
+
 import java.util.*;
+import java.util.Map.Entry;
 
 
 public class StatisticService {
@@ -15,17 +19,46 @@ public class StatisticService {
 
         System.out.printf("Most popular: %s\n", defineMostPopular());
         System.out.printf("Least popular: %s\n", defineLeastPopular());
-        System.out.printf("Highest activity: %s\n", NOT_APPLICABLE);
+        System.out.printf("Highest activity: %s\n", defineHigherActivity());
         System.out.printf("Lowest activity: %s\n", NOT_APPLICABLE);
         System.out.printf("Easiest course: %s\n", NOT_APPLICABLE);
         System.out.printf("Hardest course: %s\n", NOT_APPLICABLE);
 
-        printInfoAboutTopLearners("Java");
-        printInfoAboutTopLearners("DSA");
-        printInfoAboutTopLearners("Databases");
-        printInfoAboutTopLearners("Spring");
+        printInfoAboutTopLearners(CoursesNames.JAVA.getCourseName(), JAVA_POINTS);
+        printInfoAboutTopLearners(CoursesNames.DSA.getCourseName(), DSA_POINTS);
+        printInfoAboutTopLearners(CoursesNames.DATABASES.getCourseName(), DATABASES_POINTS);
+        printInfoAboutTopLearners(CoursesNames.SPRING.getCourseName(), SPRING_POINTS);
 
     }
+
+    private static String defineHigherActivity() {
+
+        Map<String, Integer> courseMap = new LinkedHashMap<>();
+        Map<String, Integer> courseActivityMap = new LinkedHashMap<>();
+
+        fillCourseMap(courseMap);
+
+        if(checkIfCoursesNotEnrolled(courseMap)){
+
+            return NOT_APPLICABLE;
+
+        } else {
+
+            fillCourseActivityMap(courseActivityMap);
+
+        }
+
+            int value = courseActivityMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+
+        courseActivityMap.forEach((key, value1) -> System.out.println(key + ": " + value1));
+
+            return buildResultString(value, courseActivityMap);
+        }
 
     private static String defineMostPopular() {
 
@@ -33,15 +66,21 @@ public class StatisticService {
 
         fillCourseMap(courseMap);
 
-        int value = courseMap
-                .entrySet()
-                .stream()
-                .max((entry1, entry2) ->
-                        entry1.getValue() > entry2.getValue() ? 1 : -1)
-                .get().getValue();
+        if(checkIfCoursesNotEnrolled(courseMap)){
 
-        return buildResultString(value, courseMap);
+            return NOT_APPLICABLE;
 
+        } else {
+
+            int value = courseMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+
+            return buildResultString(value, courseMap);
+        }
     }
 
     private static String defineLeastPopular() {
@@ -50,21 +89,71 @@ public class StatisticService {
 
         fillCourseMap(courseMap);
 
-        int value = courseMap
-                .entrySet()
-                .stream()
-                .max((entry1, entry2) ->
-                        entry1.getValue() > entry2.getValue() ? -1 : 1)
-                .get().getValue();
+        if(checkIfCoursesNotEnrolled(courseMap)){
 
-        return buildResultString(value, courseMap);
+            return NOT_APPLICABLE;
+
+        } else {
+
+            int value = courseMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? -1 : 1)
+                    .get().getValue();
+
+            return buildResultString(value, courseMap);
+        }
+    }
+
+    private static void fillCourseActivityMap(Map<String, Integer> map) {
+        map.put(CoursesNames.JAVA.getCourseName(),
+                CourseRepository
+                        .getCourseByName(CoursesNames.JAVA.getCourseName())
+                        .getStudentsWithScore()
+                        .values()
+                        .stream()
+                        .mapToInt(LinkedList::size)
+                        .sum());
+        map.put(CoursesNames.DSA.getCourseName(),
+                CourseRepository
+                        .getCourseByName(CoursesNames.DSA.getCourseName())
+                        .getStudentsWithScore()
+                        .values()
+                        .stream()
+                        .mapToInt(LinkedList::size)
+                        .sum());
+        map.put(CoursesNames.DATABASES.getCourseName(),
+                CourseRepository
+                        .getCourseByName(CoursesNames.DATABASES.getCourseName())
+                        .getStudentsWithScore()
+                        .values()
+                        .stream()
+                        .mapToInt(LinkedList::size)
+                        .sum());
+        map.put(CoursesNames.SPRING.getCourseName(),
+                CourseRepository
+                        .getCourseByName(CoursesNames.SPRING.getCourseName())
+                        .getStudentsWithScore()
+                        .values()
+                        .stream()
+                        .mapToInt(LinkedList::size)
+                        .sum());
     }
 
     private static void fillCourseMap(Map<String, Integer> map) {
-        map.put("Java", StudentRepository.countEnrolledStudents("Java"));
-        map.put("DSA", StudentRepository.countEnrolledStudents("DSA"));
-        map.put("Databases", StudentRepository.countEnrolledStudents("Databases"));
-        map.put("Spring", StudentRepository.countEnrolledStudents("Spring"));
+        map.put(CoursesNames.JAVA.getCourseName(),
+                CourseRepository.getCourseByName(CoursesNames.JAVA.getCourseName())
+                        .getStudentsWithScore().size());
+        map.put(CoursesNames.DSA.getCourseName(),
+                CourseRepository.getCourseByName(CoursesNames.DSA.getCourseName())
+                        .getStudentsWithScore().size());
+        map.put(CoursesNames.DATABASES.getCourseName(),
+                CourseRepository.getCourseByName(CoursesNames.DATABASES.getCourseName())
+                        .getStudentsWithScore().size());
+        map.put(CoursesNames.SPRING.getCourseName(),
+                CourseRepository.getCourseByName(CoursesNames.SPRING.getCourseName())
+                        .getStudentsWithScore().size());
     }
 
     private static String buildResultString(int value, Map<String, Integer> map) {
@@ -80,59 +169,96 @@ public class StatisticService {
         return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString().replace(" ", ", ");
     }
 
-    public static void printInfoAboutTopLearners(String courseName) {
+    public static void printInfoAboutTopLearners(String courseName, int baseCoursePoints) {
 
         System.out.println(courseName);
         System.out.println("id     points  completed");
 
-        ArrayList<Student> students = StudentRepository.getStudentRepository();
+        HashMap<Integer, Integer> studentsWithFullScore = new HashMap<>();
 
-        if (courseName.equals("Java")) {
-            students
-                    .stream()
-                    .sorted(Comparator.comparingInt(Student::getJavaPoints).reversed())
-                    .filter(student -> student.getJavaPoints() != 0)
-                    .forEach(student -> System.out.printf(Locale.US,
-                            "%d  %-8d %.1f%%\n",
-                            student.getId(),
-                            student.getJavaPoints(),
-                            (double) student.getJavaPoints() * 100 / JAVA_POINTS));
+        CourseRepository
+                .getCourseByName(courseName)
+                .getStudentsWithScore()
+                .forEach((integer, integers) -> studentsWithFullScore
+                        .put(integer, integers
+                                .stream()
+                                .mapToInt(s -> s)
+                                .sum()));
+
+
+                sortByComparator(studentsWithFullScore,false).forEach(
+                        (key, value) -> System.out.printf(Locale.US,
+                                "%d  %-8d %.1f%%\n",
+                                key,
+                                value,
+                                (double)value * 100 / baseCoursePoints));
+
+
+
+        studentsWithFullScore.clear();
+    }
+
+    private static Map<Integer, Integer> sortByComparator(Map<Integer, Integer> unsortMap, final boolean order)
+    {
+
+        List<Entry<Integer, Integer>> list = new LinkedList<Entry<Integer, Integer>>(unsortMap.entrySet());
+
+        Collections.sort(list, new Comparator<Entry<Integer, Integer>>()
+        {
+            public int compare(Entry<Integer, Integer> o1,
+                               Entry<Integer, Integer> o2)
+            {
+                if (order)
+                {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+                else
+                {
+                    return o2.getValue().compareTo(o1.getValue());
+
+                }
+            }
+        });
+
+        // Maintaining insertion order with the help of LinkedList
+        Map<Integer, Integer> sortedMap = new LinkedHashMap<Integer, Integer>();
+        for (Entry<Integer, Integer> entry : list)
+        {
+            sortedMap.put(entry.getKey(), entry.getValue());
         }
 
-        if (courseName.equals("DSA")) {
-            students
-                    .stream()
-                    .sorted(Comparator.comparingInt(Student::getDsaPoints).reversed())
-                    .filter(student -> student.getDsaPoints() != 0)
-                    .forEach(student -> System.out.printf(Locale.US,
-                            "%d  %-8d %.1f%%\n",
-                            student.getId(),
-                            student.getDsaPoints(),
-                            (double) student.getDsaPoints() * 100 / JAVA_POINTS));
+        return sortedMap;
+    }
+
+    public static int[] getPoints(int studentId) {
+        int[] points = new int[4];
+
+        points[0] = countStudentPoints(CoursesNames.JAVA.getCourseName(), studentId);
+        points[1] = countStudentPoints(CoursesNames.DSA.getCourseName(), studentId);
+        points[2] = countStudentPoints(CoursesNames.DATABASES.getCourseName(), studentId);
+        points[3] = countStudentPoints(CoursesNames.SPRING.getCourseName(), studentId);
+
+        return points;
+    }
+
+    public static int countStudentPoints(String courseName, int studentId) {
+
+        if (CourseRepository.getCourseByName(courseName).isStudentEnrolled(studentId)) {
+            int points = CourseRepository
+                    .getCourseByName(courseName)
+                    .getStudentsWithScore()
+                    .get(studentId)
+                    .stream().mapToInt(s -> s).sum();
+
+            return points;
+        } else {
+            return 0;
         }
 
-        if (courseName.equals("Databases")) {
-            students
-                    .stream()
-                    .sorted(Comparator.comparingInt(Student::getDbPoints).reversed())
-                    .filter(student -> student.getDbPoints() != 0)
-                    .forEach(student -> System.out.printf(Locale.US,
-                            "%d  %-8d %.1f%%\n",
-                            student.getId(),
-                            student.getDbPoints(),
-                            (double) student.getDbPoints() * 100 / JAVA_POINTS));
-        }
+    }
 
-        if (courseName.equals("Spring")) {
-            students
-                    .stream()
-                    .sorted(Comparator.comparingInt(Student::getSpringPoints).reversed())
-                    .filter(student -> student.getSpringPoints() != 0)
-                    .forEach(student -> System.out.printf(Locale.US,
-                            "%d  %-8d %.1f%%\n",
-                            student.getId(),
-                            student.getSpringPoints(),
-                            (double) student.getSpringPoints() * 100 / JAVA_POINTS));
-        }
+    private static boolean checkIfCoursesNotEnrolled(Map<String, Integer> courseMap){
+
+        return courseMap.values().stream().mapToInt(x -> x).sum() == 0;
     }
 }

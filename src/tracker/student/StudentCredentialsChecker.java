@@ -1,4 +1,4 @@
-package tracker;
+package tracker.student;
 
 import java.util.ArrayList;
 import java.util.Arrays;

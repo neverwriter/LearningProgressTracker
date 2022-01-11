@@ -2,6 +2,8 @@ package tracker;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tracker.student.Student;
+import tracker.student.StudentRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 

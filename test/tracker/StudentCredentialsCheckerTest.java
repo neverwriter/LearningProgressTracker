@@ -1,6 +1,7 @@
 package tracker;
 
 import org.junit.jupiter.api.Test;
+import tracker.student.StudentCredentialsChecker;
 
 import static org.junit.jupiter.api.Assertions.*;
 
