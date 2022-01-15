@@ -31,7 +31,7 @@ public class StatisticService {
     private static String defineDifficulty(boolean isHardest) {
 
         Map<String, Integer> courseMap = new LinkedHashMap<>();
-        Map<String, Double> courseDifficultyMap = new LinkedHashMap<>();
+        Map<String, Integer> courseDifficultyMap = new LinkedHashMap<>();
 
         fillCourseMap(courseMap);
 
@@ -45,25 +45,23 @@ public class StatisticService {
 
         }
 
-        double value = 0.0;
+        int value = 0;
 
         if (isHardest) {
-            value = courseDifficultyMap
-                    .entrySet()
-                    .stream()
-                    .max((entry1, entry2) ->
-                            entry1.getValue() > entry2.getValue() ? 1 : -1)
-                    .get().getValue();
-        } else {
             value = courseDifficultyMap
                     .entrySet()
                     .stream()
                     .min((entry1, entry2) ->
                             entry1.getValue() > entry2.getValue() ? 1 : -1)
                     .get().getValue();
+        } else {
+            value = courseDifficultyMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
         }
-
-        courseMap.forEach((s, aDouble) -> System.out.println(s + ": "+ aDouble));
 
         return buildResultString(value, courseDifficultyMap);
     }
@@ -141,14 +139,14 @@ public class StatisticService {
         }
     }
 
-    private static void fillCourseDifficultyMap(Map<String, Double> map) {
+    private static void fillCourseDifficultyMap(Map<String, Integer> map) {
         map.put(CoursesNames.JAVA.getCourseName(), countAverageGrade(CoursesNames.JAVA.getCourseName()));
         map.put(CoursesNames.DSA.getCourseName(), countAverageGrade(CoursesNames.DSA.getCourseName()));
         map.put(CoursesNames.DATABASES.getCourseName(), countAverageGrade(CoursesNames.DATABASES.getCourseName()));
         map.put(CoursesNames.SPRING.getCourseName(), countAverageGrade(CoursesNames.SPRING.getCourseName()));
     }
 
-    private static double countAverageGrade(String courseName){
+    private static int countAverageGrade(String courseName){
        Map<Integer, LinkedList<Integer>> list = new HashMap<>();
 
         list = CourseRepository.getCourseByName(courseName).getStudentsWithScore();
@@ -169,9 +167,7 @@ public class StatisticService {
                 .mapToInt(LinkedList::size)
                 .sum();
 
-        System.out.println((double) gradesSum/amountOfGrades);
-
-        return (double) gradesSum/amountOfGrades;
+        return (gradesSum*1000)/amountOfGrades;
 
     }
 
@@ -225,7 +221,7 @@ public class StatisticService {
                         .getStudentsWithScore().size());
     }
 
-    private static <T, G> String buildResultString(T value, Map<String, G> map) {
+    private static String buildResultString(int value, Map<String, Integer> map) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -235,9 +231,7 @@ public class StatisticService {
                 .filter(entry1 -> entry1.getValue() == value)
                 .forEach((s1 -> stringBuilder.append(s1.getKey()).append(" ")));
 
-        //deleteCharAt(stringBuilder.length() - 1)
-
-        return stringBuilder.toString().replace(" ", ", ");
+        return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString().replace(" ", ", ");
     }
 
     public static void printInfoAboutCourses(String command){
@@ -355,7 +349,7 @@ public class StatisticService {
 
     }
 
-    private static <T> boolean checkIfCoursesNotEnrolled (Map<String, T> courseMap) {
+    private static boolean checkIfCoursesNotEnrolled (Map<String, Integer> courseMap) {
 
         return courseMap.values().isEmpty();
     }
