@@ -31,7 +31,7 @@ public class StatisticService {
     private static String defineDifficulty(boolean isHardest) {
 
         Map<String, Integer> courseMap = new LinkedHashMap<>();
-        Map<String, Integer> courseActivityMap = new LinkedHashMap<>();
+        Map<String, Double> courseDifficultyMap = new LinkedHashMap<>();
 
         fillCourseMap(courseMap);
 
@@ -41,28 +41,31 @@ public class StatisticService {
 
         } else {
 
-            fillCourseActivityMap(courseActivityMap);
+            fillCourseDifficultyMap(courseDifficultyMap);
 
         }
 
-        int value = 0;
+        double value = 0.0;
 
         if (isHardest) {
-            value = courseActivityMap
+            value = courseDifficultyMap
                     .entrySet()
                     .stream()
                     .max((entry1, entry2) ->
                             entry1.getValue() > entry2.getValue() ? 1 : -1)
                     .get().getValue();
         } else {
-            value = courseActivityMap
+            value = courseDifficultyMap
                     .entrySet()
                     .stream()
                     .min((entry1, entry2) ->
                             entry1.getValue() > entry2.getValue() ? 1 : -1)
                     .get().getValue();
         }
-        return buildResultString(value, courseActivityMap);
+
+        courseMap.forEach((s, aDouble) -> System.out.println(s + ": "+ aDouble));
+
+        return buildResultString(value, courseDifficultyMap);
     }
 
     private static String defineActivity(boolean maxActivity) {
@@ -137,18 +140,12 @@ public class StatisticService {
             return buildResultString(value, courseMap);
         }
     }
-    private static void fillCoursePopularityMap(Map<String, Integer> map) {
-        map.put(CoursesNames.JAVA.getCourseName(),
-                CourseRepository
-                        .getCourseByName(CoursesNames.JAVA.getCourseName())
-                        .getStudentsWithScore()
-                        .values()
-                        .forEach(link -> link.forEach( a -> {
-                            int sum = 0;
-                            sum += a;
-                            return sum/link.size();
-                        }))
-                        );
+
+    private static void fillCourseDifficultyMap(Map<String, Double> map) {
+        map.put(CoursesNames.JAVA.getCourseName(), countAverageGrade(CoursesNames.JAVA.getCourseName()));
+        map.put(CoursesNames.DSA.getCourseName(), countAverageGrade(CoursesNames.DSA.getCourseName()));
+        map.put(CoursesNames.DATABASES.getCourseName(), countAverageGrade(CoursesNames.DATABASES.getCourseName()));
+        map.put(CoursesNames.SPRING.getCourseName(), countAverageGrade(CoursesNames.SPRING.getCourseName()));
     }
 
     private static double countAverageGrade(String courseName){
@@ -158,7 +155,24 @@ public class StatisticService {
 
         ArrayList<LinkedList<Integer>> arrayList = new ArrayList<>();
 
-        list.entrySet().;
+        list.entrySet().stream().forEach(entry -> {
+            arrayList.add(entry.getValue());
+        });
+
+        int gradesSum = arrayList.stream().flatMap(Collection::stream).mapToInt(grade -> grade).sum();
+
+        int amountOfGrades = CourseRepository
+                .getCourseByName(courseName)
+                .getStudentsWithScore()
+                .values()
+                .stream()
+                .mapToInt(LinkedList::size)
+                .sum();
+
+        System.out.println((double) gradesSum/amountOfGrades);
+
+        return (double) gradesSum/amountOfGrades;
+
     }
 
     private static void fillCourseActivityMap(Map<String, Integer> map) {
@@ -211,7 +225,7 @@ public class StatisticService {
                         .getStudentsWithScore().size());
     }
 
-    private static String buildResultString(int value, Map<String, Integer> map) {
+    private static <T, G> String buildResultString(T value, Map<String, G> map) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -221,7 +235,9 @@ public class StatisticService {
                 .filter(entry1 -> entry1.getValue() == value)
                 .forEach((s1 -> stringBuilder.append(s1.getKey()).append(" ")));
 
-        return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString().replace(" ", ", ");
+        //deleteCharAt(stringBuilder.length() - 1)
+
+        return stringBuilder.toString().replace(" ", ", ");
     }
 
     public static void printInfoAboutCourses(String command){
@@ -339,8 +355,8 @@ public class StatisticService {
 
     }
 
-    private static boolean checkIfCoursesNotEnrolled(Map<String, Integer> courseMap) {
+    private static <T> boolean checkIfCoursesNotEnrolled (Map<String, T> courseMap) {
 
-        return courseMap.values().stream().mapToInt(x -> x).sum() == 0;
+        return courseMap.values().isEmpty();
     }
 }
