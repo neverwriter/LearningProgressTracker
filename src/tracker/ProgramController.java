@@ -173,7 +173,7 @@ public class ProgramController {
 
         while (!statisticSelectCommand.equalsIgnoreCase(Command.BACK.getCommand())) {
 
-
+            StatisticService.printInfoAboutCourses(statisticSelectCommand);
 
             statisticSelectCommand = CommandReader.readCommand();
 
