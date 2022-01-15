@@ -92,15 +92,35 @@ public class StatisticService {
                     .max((entry1, entry2) ->
                             entry1.getValue() > entry2.getValue() ? 1 : -1)
                     .get().getValue();
+
+            return buildResultString(value, courseActivityMap);
+
         } else {
+
             value = courseActivityMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+
+            int valueMin = 0;
+            valueMin = courseActivityMap
                     .entrySet()
                     .stream()
                     .min((entry1, entry2) ->
                             entry1.getValue() > entry2.getValue() ? 1 : -1)
                     .get().getValue();
+
+
+            if (value == valueMin){
+        return NOT_APPLICABLE;
+            } else {
+
+                return buildResultString(value, courseActivityMap);
+            }
         }
-        return buildResultString(value, courseActivityMap);
+
     }
 
     private static String definePopular(boolean maxPopular) {
@@ -125,17 +145,33 @@ public class StatisticService {
                         .max((entry1, entry2) ->
                                 entry1.getValue() > entry2.getValue() ? 1 : -1)
                         .get().getValue();
+
+                return buildResultString(value, courseMap);
             } else {
 
                 value = courseMap
                         .entrySet()
                         .stream()
+                        .max((entry1, entry2) ->
+                                entry1.getValue() > entry2.getValue() ? 1 : -1)
+                        .get().getValue();
+
+                int valueMin = 0;
+                valueMin = courseMap
+                        .entrySet()
+                        .stream()
                         .min((entry1, entry2) ->
                                 entry1.getValue() > entry2.getValue() ? 1 : -1)
                         .get().getValue();
+
+                if (value == valueMin){
+                    return NOT_APPLICABLE;
+                } else {
+                    return buildResultString(valueMin, courseMap);
+                }
             }
 
-            return buildResultString(value, courseMap);
+
         }
     }
 
@@ -351,6 +387,6 @@ public class StatisticService {
 
     private static boolean checkIfCoursesNotEnrolled (Map<String, Integer> courseMap) {
 
-        return courseMap.values().isEmpty();
+        return courseMap.values().stream().mapToInt(x -> x).sum() == 0;
     }
 }
