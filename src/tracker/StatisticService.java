@@ -17,28 +17,63 @@ public class StatisticService {
 
     public static void basicDetailsPrinter() {
 
-        System.out.printf("Most popular: %s\n", defineMostPopular());
-        System.out.printf("Least popular: %s\n", defineLeastPopular());
-        System.out.printf("Highest activity: %s\n", defineHigherActivity());
-        System.out.printf("Lowest activity: %s\n", NOT_APPLICABLE);
-        System.out.printf("Easiest course: %s\n", NOT_APPLICABLE);
-        System.out.printf("Hardest course: %s\n", NOT_APPLICABLE);
+        System.out.printf("Most popular: %s\n", definePopular(true));
+        System.out.printf("Least popular: %s\n", definePopular(false));
+        System.out.printf("Highest activity: %s\n", defineActivity(true));
+        System.out.printf("Lowest activity: %s\n", defineActivity(false));
+        System.out.printf("Easiest course: %s\n", defineDifficulty(false));
+        System.out.printf("Hardest course: %s\n", defineDifficulty(true));
 
-        printInfoAboutTopLearners(CoursesNames.JAVA.getCourseName(), JAVA_POINTS);
-        printInfoAboutTopLearners(CoursesNames.DSA.getCourseName(), DSA_POINTS);
-        printInfoAboutTopLearners(CoursesNames.DATABASES.getCourseName(), DATABASES_POINTS);
-        printInfoAboutTopLearners(CoursesNames.SPRING.getCourseName(), SPRING_POINTS);
+
 
     }
 
-    private static String defineHigherActivity() {
+    private static String defineDifficulty(boolean isHardest) {
+
+        Map<String, Integer> courseMap = new LinkedHashMap<>();
+        Map<String, Integer> courseDifficultyMap = new LinkedHashMap<>();
+
+        fillCourseMap(courseMap);
+
+        if (checkIfCoursesNotEnrolled(courseMap)) {
+
+            return NOT_APPLICABLE;
+
+        } else {
+
+            fillCourseDifficultyMap(courseDifficultyMap);
+
+        }
+
+        int value = 0;
+
+        if (isHardest) {
+            value = courseDifficultyMap
+                    .entrySet()
+                    .stream()
+                    .min((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+        } else {
+            value = courseDifficultyMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+        }
+
+        return buildResultString(value, courseDifficultyMap);
+    }
+
+    private static String defineActivity(boolean maxActivity) {
 
         Map<String, Integer> courseMap = new LinkedHashMap<>();
         Map<String, Integer> courseActivityMap = new LinkedHashMap<>();
 
         fillCourseMap(courseMap);
 
-        if(checkIfCoursesNotEnrolled(courseMap)){
+        if (checkIfCoursesNotEnrolled(courseMap)) {
 
             return NOT_APPLICABLE;
 
@@ -48,62 +83,128 @@ public class StatisticService {
 
         }
 
-            int value = courseActivityMap
+        int value = 0;
+
+        if (maxActivity) {
+            value = courseActivityMap
                     .entrySet()
                     .stream()
                     .max((entry1, entry2) ->
                             entry1.getValue() > entry2.getValue() ? 1 : -1)
                     .get().getValue();
 
-        courseActivityMap.forEach((key, value1) -> System.out.println(key + ": " + value1));
-
             return buildResultString(value, courseActivityMap);
+
+        } else {
+
+            value = courseActivityMap
+                    .entrySet()
+                    .stream()
+                    .max((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+
+            int valueMin = 0;
+            valueMin = courseActivityMap
+                    .entrySet()
+                    .stream()
+                    .min((entry1, entry2) ->
+                            entry1.getValue() > entry2.getValue() ? 1 : -1)
+                    .get().getValue();
+
+
+            if (value == valueMin){
+        return NOT_APPLICABLE;
+            } else {
+
+                return buildResultString(value, courseActivityMap);
+            }
         }
 
-    private static String defineMostPopular() {
+    }
+
+    private static String definePopular(boolean maxPopular) {
 
         Map<String, Integer> courseMap = new LinkedHashMap<>();
 
         fillCourseMap(courseMap);
 
-        if(checkIfCoursesNotEnrolled(courseMap)){
+        if (checkIfCoursesNotEnrolled(courseMap)) {
 
             return NOT_APPLICABLE;
 
         } else {
 
-            int value = courseMap
-                    .entrySet()
-                    .stream()
-                    .max((entry1, entry2) ->
-                            entry1.getValue() > entry2.getValue() ? 1 : -1)
-                    .get().getValue();
+            int value = 0;
 
-            return buildResultString(value, courseMap);
+            if (maxPopular) {
+
+                value = courseMap
+                        .entrySet()
+                        .stream()
+                        .max((entry1, entry2) ->
+                                entry1.getValue() > entry2.getValue() ? 1 : -1)
+                        .get().getValue();
+
+                return buildResultString(value, courseMap);
+            } else {
+
+                value = courseMap
+                        .entrySet()
+                        .stream()
+                        .max((entry1, entry2) ->
+                                entry1.getValue() > entry2.getValue() ? 1 : -1)
+                        .get().getValue();
+
+                int valueMin = 0;
+                valueMin = courseMap
+                        .entrySet()
+                        .stream()
+                        .min((entry1, entry2) ->
+                                entry1.getValue() > entry2.getValue() ? 1 : -1)
+                        .get().getValue();
+
+                if (value == valueMin){
+                    return NOT_APPLICABLE;
+                } else {
+                    return buildResultString(valueMin, courseMap);
+                }
+            }
+
+
         }
     }
 
-    private static String defineLeastPopular() {
+    private static void fillCourseDifficultyMap(Map<String, Integer> map) {
+        map.put(CoursesNames.JAVA.getCourseName(), countAverageGrade(CoursesNames.JAVA.getCourseName()));
+        map.put(CoursesNames.DSA.getCourseName(), countAverageGrade(CoursesNames.DSA.getCourseName()));
+        map.put(CoursesNames.DATABASES.getCourseName(), countAverageGrade(CoursesNames.DATABASES.getCourseName()));
+        map.put(CoursesNames.SPRING.getCourseName(), countAverageGrade(CoursesNames.SPRING.getCourseName()));
+    }
 
-        Map<String, Integer> courseMap = new LinkedHashMap<>();
+    private static int countAverageGrade(String courseName){
+       Map<Integer, LinkedList<Integer>> list = new HashMap<>();
 
-        fillCourseMap(courseMap);
+        list = CourseRepository.getCourseByName(courseName).getStudentsWithScore();
 
-        if(checkIfCoursesNotEnrolled(courseMap)){
+        ArrayList<LinkedList<Integer>> arrayList = new ArrayList<>();
 
-            return NOT_APPLICABLE;
+        list.entrySet().stream().forEach(entry -> {
+            arrayList.add(entry.getValue());
+        });
 
-        } else {
+        int gradesSum = arrayList.stream().flatMap(Collection::stream).mapToInt(grade -> grade).sum();
 
-            int value = courseMap
-                    .entrySet()
-                    .stream()
-                    .max((entry1, entry2) ->
-                            entry1.getValue() > entry2.getValue() ? -1 : 1)
-                    .get().getValue();
+        int amountOfGrades = CourseRepository
+                .getCourseByName(courseName)
+                .getStudentsWithScore()
+                .values()
+                .stream()
+                .mapToInt(LinkedList::size)
+                .sum();
 
-            return buildResultString(value, courseMap);
-        }
+        return (gradesSum*1000)/amountOfGrades;
+
     }
 
     private static void fillCourseActivityMap(Map<String, Integer> map) {
@@ -169,7 +270,42 @@ public class StatisticService {
         return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString().replace(" ", ", ");
     }
 
-    public static void printInfoAboutTopLearners(String courseName, int baseCoursePoints) {
+    public static void printInfoAboutCourses(String command){
+
+        if (command.equalsIgnoreCase(CoursesNames.JAVA.getCourseName())) {
+
+            printInfoAboutTopLearners(CoursesNames.JAVA.getCourseName(), JAVA_POINTS);
+
+        } else  if (command.equalsIgnoreCase(CoursesNames.DSA.getCourseName())) {
+
+            printInfoAboutTopLearners(CoursesNames.DSA.getCourseName(), DSA_POINTS);
+
+        } else  if (command.equalsIgnoreCase(CoursesNames.DATABASES.getCourseName())) {
+
+            printInfoAboutTopLearners(CoursesNames.DATABASES.getCourseName(), DATABASES_POINTS);
+
+        } else  if (command.equalsIgnoreCase(CoursesNames.SPRING.getCourseName())) {
+
+            printInfoAboutTopLearners(CoursesNames.SPRING.getCourseName(), SPRING_POINTS);
+
+        } else if (command.equalsIgnoreCase(Command.STATISTICS.getCommand())){
+
+            printInfoAboutTopLearners(CoursesNames.JAVA.getCourseName(), JAVA_POINTS);
+
+            printInfoAboutTopLearners(CoursesNames.DSA.getCourseName(), DSA_POINTS);
+
+            printInfoAboutTopLearners(CoursesNames.DATABASES.getCourseName(), DATABASES_POINTS);
+
+            printInfoAboutTopLearners(CoursesNames.SPRING.getCourseName(), SPRING_POINTS);
+
+        }  else {
+            System.out.println("Unknown course.");
+        }
+
+
+    }
+
+    private static void printInfoAboutTopLearners(String courseName, int baseCoursePoints) {
 
         System.out.println(courseName);
         System.out.println("id     points  completed");
@@ -186,34 +322,27 @@ public class StatisticService {
                                 .sum()));
 
 
-                sortByComparator(studentsWithFullScore,false).forEach(
-                        (key, value) -> System.out.printf(Locale.US,
-                                "%d  %-8d %.1f%%\n",
-                                key,
-                                value,
-                                (double)value * 100 / baseCoursePoints));
-
+        sortByComparator(studentsWithFullScore, false).forEach(
+                (key, value) -> System.out.printf(Locale.US,
+                        "%d  %-8d %.1f%%\n",
+                        key,
+                        value,
+                        (double) value * 100 / baseCoursePoints));
 
 
         studentsWithFullScore.clear();
     }
 
-    private static Map<Integer, Integer> sortByComparator(Map<Integer, Integer> unsortMap, final boolean order)
-    {
+    private static Map<Integer, Integer> sortByComparator(Map<Integer, Integer> unsortMap, final boolean order) {
 
         List<Entry<Integer, Integer>> list = new LinkedList<Entry<Integer, Integer>>(unsortMap.entrySet());
 
-        Collections.sort(list, new Comparator<Entry<Integer, Integer>>()
-        {
+        Collections.sort(list, new Comparator<Entry<Integer, Integer>>() {
             public int compare(Entry<Integer, Integer> o1,
-                               Entry<Integer, Integer> o2)
-            {
-                if (order)
-                {
+                               Entry<Integer, Integer> o2) {
+                if (order) {
                     return o1.getValue().compareTo(o2.getValue());
-                }
-                else
-                {
+                } else {
                     return o2.getValue().compareTo(o1.getValue());
 
                 }
@@ -222,8 +351,7 @@ public class StatisticService {
 
         // Maintaining insertion order with the help of LinkedList
         Map<Integer, Integer> sortedMap = new LinkedHashMap<Integer, Integer>();
-        for (Entry<Integer, Integer> entry : list)
-        {
+        for (Entry<Integer, Integer> entry : list) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
 
@@ -257,7 +385,7 @@ public class StatisticService {
 
     }
 
-    private static boolean checkIfCoursesNotEnrolled(Map<String, Integer> courseMap){
+    private static boolean checkIfCoursesNotEnrolled (Map<String, Integer> courseMap) {
 
         return courseMap.values().stream().mapToInt(x -> x).sum() == 0;
     }
