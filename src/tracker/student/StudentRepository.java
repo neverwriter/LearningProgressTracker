@@ -1,8 +1,7 @@
 package tracker.student;
 
-import tracker.student.Student;
-
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class StudentRepository {
 
@@ -24,6 +23,40 @@ public class StudentRepository {
         return studentRepository.stream().anyMatch(student ->
                 student.getEmail().equals(email));
     }
+
+    public static String getStudentEmailById(int studentId){
+    AtomicReference<String> email = new AtomicReference<>();
+        studentRepository.forEach(student -> {
+            if(student.getId() == studentId){
+                email.set(student.getEmail());
+            }
+        });
+
+        return email.toString();
+    }
+
+    public static String getStudentFirstNameById(int studentId){
+        AtomicReference<String> name = new AtomicReference<>();
+        studentRepository.forEach(student -> {
+            if(student.getId() == studentId){
+                name.set(student.getFirstName());
+            }
+        });
+
+        return name.toString();
+    }
+
+    public static String getStudentLastNameById(int studentId){
+        AtomicReference<String> name = new AtomicReference<>();
+        studentRepository.forEach(student -> {
+            if(student.getId() == studentId){
+                name.set(student.getLastName());
+            }
+        });
+
+        return name.toString();
+    }
+
 
     public static void addStudent(Student student) {
 

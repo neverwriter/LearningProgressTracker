@@ -1,9 +1,8 @@
 package tracker;
 
-
-import tracker.course.CourseRepository;
 import tracker.course.CourseRepositorySeeder;
 import tracker.course.CourseService;
+import tracker.notification.NotificationService;
 import tracker.student.Student;
 import tracker.student.StudentCredentialsChecker;
 import tracker.student.StudentRepository;
@@ -85,6 +84,12 @@ public class ProgramController {
         } else if (command.equalsIgnoreCase(Command.SEED.getCommand())) {
 
             seedStudentRepository();
+
+        } else if (command.equalsIgnoreCase(Command.NOTIFY.getCommand())) {
+
+            int studnets = NotificationService.notifyStudents();
+
+            System.out.printf("Total %d students have been notified%n", studnets);
 
         } else {
 

@@ -8,7 +8,8 @@ public enum Command {
     FIND("FIND"),
     ADD_POINTS("ADD POINTS"),
     SEED("SEED"),
-    STATISTICS("STATISTICS");
+    STATISTICS("STATISTICS"),
+    NOTIFY("NOTIFY");
 
 
     private String command;
